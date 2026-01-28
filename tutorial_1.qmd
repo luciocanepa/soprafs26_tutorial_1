@@ -1,0 +1,702 @@
+---
+title: "Tutorial 1 - SOPRA"
+author: "Lucio Canepa"
+date: last-modified
+toc: true
+number-sections: true
+language:
+  en:
+    published: "Last update"
+format:
+  html:
+    theme: cosmo
+    code-copy: true
+    smooth-scroll: true
+    html-math-method: katex
+  pdf:
+    pdf-engine: xelatex
+    documentclass: scrartcl     # KOMA-Script article (European standard)
+    mainfont: "TeX Gyre Heros"  # A clean Sans-Serif font (Helvetica clone, standard in TeX)
+    sansfont: "TeX Gyre Heros"
+    monofont: "TeX Gyre Cursor" # A clean Monospace font (Courier clone)
+    geometry:
+      - top=25mm
+      - bottom=25mm
+      - left=25mm
+      - right=25mm
+    colorlinks: true
+    code-block-bg: true
+
+    # CRITICAL FIXES FOR PDF:
+    include-in-header:
+      text: |
+        \usepackage{fvextra}
+        \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines=true,breakanywhere=true,commandchars=\\\{\}}
+        \RecustomVerbatimEnvironment{verbatim}{Verbatim}{breaklines=true,breakanywhere=true}
+---
+
+## What do you need before starting
+
+- [git](https://git-scm.com/install/mac): version control system
+- java 17+ (JDK) installed and `JAVA_HOME` environment variable set
+
+
+- [Github account](https://github.com/)
+- ssh key to authenticate with Github easily
+
+:::{.callout-note icon=false appearance=minimal collapse="true" title="Setup ssh key"}
+
+:::{.callout-note icon=false}
+If you are on Windows, first install Linux Subsystem for Windows (WSL) and then follow the instructions below.
+:::
+
+In your terminal:
+
+```bash
+ssh-keygen -t ed25519 -C "<my_computer_name>"
+````
+
+It will prompt you for:
+
+- choosing location (default is fine)
+- choosing a passphrase (optional: can leave blank for no passphrase)
+
+Then, add the ssh key to the ssh-agent:
+```bash
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+```
+
+You need the public key to add it to your Github account:
+```bash
+cat ~/.ssh/id_ed25519.pub
+```
+
+:::{.callout-note appearance=minimal title="Link ssh key to Github account" collapse=true}
+
+1. Go to your Github settings
+
+![](assets/github_settings.png){height=500px}
+
+2. Go to "SSH and GPG keys"
+
+![](assets/ssh_github_settings.png){height=320px}
+
+3. Click on "New SSH key", give it a title (e.g. "My Laptop") and paste the public key you got from `cat ~/.ssh/id_ed25519.pub`
+
+![](assets/add_ssh_key_to_github.png){height=300px}
+
+4. Once you added it, you can use ssh to clone repositories from Github:
+
+![](assets/clone_with_ssh.png){height=250px}
+
+:::
+
+Now you are able to act on remote repositories hosted on Github without entering your credentials every time. Always use the ssh url when cloning repositories from Github.
+:::
+
+:::{.callout-note icon=false appearance=minimal collapse="true" title="Install Java 17"}
+
+:::{.callout-note icon=false collapse="true" title="Mac"}
+
+If you are on a Mac, you can install Java 17 with Homebrew:
+```bash
+brew install --cask temurin@17
+```
+
+Run:
+```bash
+/usr/libexec/java_home -v 17
+/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home
+````
+to locate your Java 17 installation path.
+
+Run:
+```bash
+which ${SHELL}
+/bin/zsh
+```
+
+to find out which shell you are using.
+
+Then, add the following line to your shell configuration file (`.zshrc` for zsh, `.bash_profile` or `.bashrc` for bash):
+
+```bash
+code ~/.zshrc
+```
+
+paste
+
+```
+export JAVA_HOME=$(/usr/libexec/java_home -v 17)
+export PATH="$JAVA_HOME/bin:$PATH"
+```
+
+at the end of the file, save and close it.
+
+Run `source ~/.zshrc` to reload the configuration file.
+
+Ensure you have Java 17 installed and configured correctly by running:
+```txt
+macvm@Macs-Virtual-Machine sopra_server_tutorial % java -version
+openjdk version "17.0.17" 2025-10-21
+OpenJDK Runtime Environment Temurin-17.0.17+10 (build 17.0.17+10)
+OpenJDK 64-Bit Server VM Temurin-17.0.17+10 (build 17.0.17+10, mixed mode, sharing)
+macvm@Macs-Virtual-Machine sopra_server_tutorial % echo $JAVA_HOME
+/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home
+macvm@Macs-Virtual-Machine sopra_server_tutorial % which java
+/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home/bin/java
+```
+
+:::{.callout-note}
+Checking `java -version` is usually enough to verify the installation.
+:::
+
+:::
+
+:::{.callout-important title="TODO"}
+
+**Linux / Windows**
+
+:::
+
+:::
+
+:::{.callout-important title="TODO"}
+
+**Install WSL on Windows**
+
+:::
+
+:::{.callout-tip}
+If your are on a Mac, I highly recommend installing [Homebrew](https://brew.sh/) as package manager:
+
+- You can install packages with: `brew install <package_name>`
+- You can install applications with: `brew install --cask <application_name>`
+:::
+
+## Clone repositories & run code locally
+
+Navigate to the folder where you want to store the project and clone the repository:
+
+```bash
+cd <path_to_your_folder>
+git clone git@github.com:<user_name>/<repository_name>.git
+```
+
+where `<repository_name>` are the names of the server and client repositories you created from sopra templates.
+
+:::{.callout-note appearance="minimal" collapse="true" title="Details"}
+```txt
+macvm@Macs-Virtual-Machine ~ % mkdir sopra
+macvm@Macs-Virtual-Machine ~ % cd sopra
+macvm@Macs-Virtual-Machine sopra % git clone git@github.com:<user_name>/sopra_server_tutorial.git
+Cloning into 'sopra_server_tutorial'...
+The authenticity of host 'github.com (140.82.121.4)' can't be established.
+ED25519 key fingerprint is <your_SHA256_fingerprint>.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added 'github.com' (ED25519) to the list of known hosts.
+remote: Enumerating objects: 73, done.
+remote: Counting objects: 100% (73/73), done.
+remote: Compressing objects: 100% (46/46), done.
+remote: Total 73 (delta 3), reused 72 (delta 3), pack-reused 0 (from 0)
+Receiving objects: 100% (73/73), 71.61 KiB | 596.00 KiB/s, done.
+Resolving deltas: 100% (3/3), done.
+macvm@Macs-Virtual-Machine sopra % git clone git@github.com:<user_name>/sopra_client_tutorial.git
+Cloning into 'sopra_client_tutorial'...
+remote: Enumerating objects: 52, done.
+remote: Counting objects: 100% (52/52), done.
+remote: Compressing objects: 100% (47/47), done.
+remote: Total 52 (delta 0), reused 52 (delta 0), pack-reused 0 (from 0)
+Receiving objects: 100% (52/52), 120.59 KiB | 620.00 KiB/s, done.
+macvm@Macs-Virtual-Machine sopra % ls
+sopra_client_tutorial	sopra_server_tutorial
+```
+:::
+
+:::{.callout-caution}
+Use the ssh url when cloning the repository.
+:::
+
+At this point you can already look into the code, read the `README.md` file and run the project locally.
+
+:::{.callout-tip}
+If you are using [VSCode](https://code.visualstudio.com/download) as code editor, you can open the folder directly from terminal with `code <repo_name>` after activating `Shell Command: Install 'code' command in PATH` from the Command Palette (`Cmd+Shift+P` / `Ctrl+Shift+P`).
+
+Or `code .` to open the current folder.
+:::
+
+### Client repository
+
+Run `source setup.sh` as described in the `README.md` to install needed packages / dependencies.
+
+Deno and npm (2 TS to JS runtimes) are available in the repository: use `deno task dev` to run the development server locally (at default port `localhost:3000`).
+
+At `package.json` you can find available scripts:
+
+```json
+"scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "deno lint",
+    "fmt": "deno fmt"
+  },
+```
+
+The code for your app lives under `app/` folder: there you can find the entry point to the application at `app/page.tsx`. Try to change something to see it automatically update in the browser on save.
+
+### Server repository
+
+:::{.callout-tip}
+If while `cd`-ing into a repo folder this message shows up:
+
+```bash
+macvm@Macs-Virtual-Machine sopra % cd sopra_server_tutorial
+direnv: error /Users/macvm/sopra/sopra_server_tutorial/.envrc is blocked. Run `direnv allow` to approve its content
+```
+
+run `direnv allow` to enable the automatic environment variable loading.
+:::
+
+To build the application, use the provided Gradle wrapper. You first need to grant permission to the executable:
+
+```bash
+chmod +x gradlew
+./gradlew build
+```
+
+The first time you run this, the Gradle wrapper will download the necessary Gradle distribution.
+
+If everything works correctly, you will see:
+
+```txt
+BUILD SUCCESSFUL in 2m 50s
+7 actionable tasks: 7 executed
+```
+
+:::{.callout-note}
+As suggested in the `README.md`, you can build the application continuously with:
+```bash
+./gradlew build --continuous -xtest
+```
+the two flags allow for:
+
+- `--continuous`: to automatically recompile the code on changes
+- `-xtest`: to skip running tests on every build
+:::
+
+To run the server locally, use:
+```bash
+./gradlew bootRun
+```
+
+This runs on `localhost:8080` by default: there you will see `The application is running.`
+
+At `localhost:8080/h2-console` you can access the H2 database console: Information needed to access the console are at `src/main/resources/application.properties`.
+
+
+## Git & Github workflows
+
+### Git short guide
+
+To get started working with local / remote repositories and collaborate with your team members, it's important to get to know the most used git commands. [Videos](https://youtu.be/Ala6PHlYjmw?si=Tkj5vX3EtMhbngEg), the [official documentation](https://git-scm.com/docs/git) and LLMs (with caution) are good starting point.
+
+Here we selected a subset of commands we consider relevant for this course.
+
+:::{.callout-note appearance=minimal collapse=true title="Fundamentals"}
+
+Git is a version control system based on branches that allows users to keep track of the file changes at a location. It allows to store incremental changes (`commits`) and to develop experimental features separately to the main code (`branch` and `merge`). ALl of this happens locally, on your machine. It's possible to connect your local repository to a remote origin (this happens automatically when you `clone` a repository from Github). Github simply acts as a second peer (the upstream) to whom you can `push` changes and from which you can `pull` changes (added by a team member).
+
+The repositories you work on for Milestone 1 only have 1 branch, the `main` branch (standard entry point for an application).
+
+- `git pull` tries to copy the changes of the branch you are currently on from the remote repository to your local one. This allows you to stay up-to-date with changes from other users.
+
+Let's say you modified a file in your repository:
+
+|add title to main `page.tsx`|
+|---|
+|![](assets/git_1.png){height=400px}|
+
+`git status` is a very useful command that gives you the snapshot (current state) of your branch:
+
+- tells you on what branch you are and wheter it's up-to-date with the remote branch
+- lists all the files that were: modified, added, removed
+- lists all the changes that are: untracked, unstaged, staged
+
+You can move a change to the _staging area_ (prepare them for a commit) with:
+
+- `git add <file_name>`
+- `git add .` to add all changes at once
+
+Run `git  status` to see what happened
+
+:::{.callout-caution}
+
+Before commiting the first time, ensure your `user.name` and `user.email` are properly set. In this way you can _sign_ the commit: use your Github email and username to do so with:
+
+```bash
+macvm@Macs-Virtual-Machine sopra_client_tutorial % git config --local user.name "<username>"
+macvm@Macs-Virtual-Machine sopra_client_tutorial % git config --local user.email "<email>"
+macvm@Macs-Virtual-Machine sopra_client_tutorial % git config --local user.name
+<username>
+macvm@Macs-Virtual-Machine sopra_client_tutorial % git config --local user.email
+<email>
+macvm@Macs-Virtual-Machine sopra_client_tutorial %
+```
+
+You can choose beetween:
+
+- the `--local` flag (recommended) that sets name and email for this specific repository (you need to do it both on the server and on the client repositories). This allows you to have multiple repositories on your computer linked to remotes where you are logged with different accounts / you want to sign your commits differently
+- the `--global` flag: all the commits on your machine are going to be signed with name and email you set
+
+:::
+
+With `commit -m "<commit_message>"` you can create a commit with its commit message (where you described the changes / reference the issue / bug it solves)
+
+You can see your commit with `git log`.
+
+You can push the commit(s) to the remote repository with:
+
+- `git push` if the branch already exist on the remote
+- `git push --set-upstream origin <new_branch_name>` to register a new local branch with your commit(s) on the remote repository
+
+:::
+
+:::{.callout-note appearance=minimal collapse=true title="Branching"}
+
+A branch is a reference (pointer) to a commit, usually used to develop a new feature, fix a bug, etc. while maintaining the main branch (often – and in this course – continously deployed) always working.
+
+**Access branches**
+
+- You can move your `HEAD` to an already existing branch with `git checkout <branch_name>`
+- You can create a new branch pointing at current `HEAD` location with `git checkout -b <new_branch_name>`
+
+You can `fetch` updates of a branch / branches in a repository with:
+
+- `git fetch <branch-name>` gets you updates of that branch
+- `git fetch --all` tells you what's new: new branch(es) has been created
+- `git branch` lists all locally available branches (often useful to run together with `git fetch --all`)
+
+**Manage branches**
+
+Once your work in a branch is finished and you are ready to integrate your changes to the `main` branch (to deploy it). You want to `merge` your branch on the `main` branch:
+
+- move to main: `git checkout main`
+- merge your_branch to main: `git merge <your_branch>`
+- this will create new commits _on top_ of the `main` branch. Your  branch and commits still exists at `git checkout <your_branch>`
+- to update the remote repository with your changes: `git push`
+
+:::{.callout-caution}
+
+before merging, always `pull` to get the latest changes on `main`
+
+:::
+
+If you are interested in other ways to manage your branches and history, look into `rebase` and `cherrypick`.
+
+**Delete a branch**
+
+- You can delete a branch locally with `git branch -d <branch_name>`
+- You can _publish_ your deletion (delete the branch on the remote repository as well) with `git push origin --delete <branch_name>`
+
+:::
+
+:::{.callout-warning appearance=minimal collapse=true title="Recovery"}
+
+If while working you realize you commited / pushed / lost something accidentally git offers some commands to rescue your code.
+
+**Reshape local history**
+
+If you didn't yet pushed your changes / commit to the remote repository, you are free to modify them as you wish:
+
+- `git reset --soft HEAD~1` removes your last commit and leaves your changes in the staging area. This is useful if you want to add / remove something from that commit or change the commit message. (**Be careful:** make sure to use the `--soft` flag)
+- `git rebase -i <commit_hash>` lets you modify interactively the commits from your `HEAD` to the commit the hash references to. This is useful to `squash` commits together, modify their commit messages or `drop` them.
+
+:::{callout-note}
+
+When needed (_eg._ when rebasing), git opens an interactive shell. By default is vi. If you wish to change it, you can configure the behavior with:
+
+`git config --global core.editor "code --wait"`
+
+- `--global` or `--local` flags to change the editor everywhere or just for this repository
+- the `--wait` flag is needed for window-based editors: it waits until you close the editor to proceed. This is not needed with terminal-based editors.
+
+:::
+
+**Recover a lost commit / branch**
+
+A useful command in this scenario is `git reflog`. It shows all the recent _places_ (hashes) you `HEAD` has been pointing to: you can checkout to the desired hash, branch off and recover that snapshot.
+
+**Reshape remote (shared) history**
+
+As a general advice, you should **never** change the history of an already pushed commit / branch. This can cause a lot of troubles to your team members and prevent you to recover specific changes or have a good sense of the rationale behind a change.
+
+In an ideal world, each commit has the right size: not too small, not too big – contains one specific change described by a clear commit message that explains what the commit does and references the issue / bug it implements / solve. Unfortunately we don't live in an ideal world and sometimes the history of a repository is not as clean as we wish.
+
+If you want a clean history on the main branch / on specific feature branches, it's advised to:
+
+- rebase the feature branch before merging on the main branch: many changes appear as a single commit and the remote branch stays untouched (preserving the full history)
+- create a new _cleaned_ branch to keep working on / to merge, but keeping the old branch for future reference / recovery.
+
+You should decide as a team what you want to prioritise and what approach / rules to follow in this project.
+
+:::
+
+:::{.callout-important title="TODO"}
+
+**Resolve conflicts**
+
+:::
+
+
+:::{.callout-tip appearance=minimal collapse=false title="Best practices"}
+
+**Commits**
+
+- keep your commits small / reasonable size: each commit should implement and be responsible of a specific change (add a feature, solve a bug)
+- give a title (short description) to your commit messages, then explain what you did and why. If possible, reference to an issue / bug number the commit is about.
+
+**Branches**
+
+- name your branches in a clear way: decide with your team what is the criteria for naming branches:
+    - camelCase, snake_case, etc.
+    - just issue number / issue number + name
+    - naming convention when a feature branch is checked out
+
+**General**
+
+- always `pull` before you start working (`fetch` as well)
+- always `pull` before you `push`
+
+:::
+
+### Github workflows
+
+:::{.callout-important title="TODO"}
+
+**Briefly explain what Github workflows are / where they live in the repo / their structure**
+
+:::
+
+
+## Set-up Google Cloud and Vercel & deploy your project
+
+### Set-up Google Cloud and link it to the server repository
+
+:::{.callout-note appearance=minimal collapse=true title="Set-up Google Cloud"}
+
+|Navigate to [cloud.google.com](cloud.google.com) and create an account / login|
+|---|
+|Click on `console`|
+|![](assets/gc_1.png){height=400px}|
+|Click on the project selection|
+|![](assets/gc_2.png){height=400px}|
+|Create new project|
+|![](assets/gc_3.png){height=400px}|
+|Name it according to specification: `sopra-fs26-lastname-firstname-server` & click `create`|
+|![](assets/gc_4.png){height=400px}|
+|Navigate to `IAM and admin` < `Service accounts`|
+|![](assets/gc_5.png){height=400px}|
+|Create a new service account|
+|![](assets/gc_6.png){height=400px}|
+|Name it as you wish (it will grant editor access) & click `Create and continue`|
+|![](assets/gc_7.png){height=400px}|
+|add editor role in step 2 - permission (you can search for it) & click `Continue`|
+|![](assets/gc_8.png){height=400px}|
+|Click `done`|
+|![](assets/gc_9.png){height=400px}|
+|Next to the created service account, select more > `Manage keys`|
+|![](assets/gc_10.png){height=400px}|
+|Add a new key|
+|![](assets/gc_11.png){height=400px}|
+|in JSON format (default)|
+|![](assets/gc_12.png){height=400px}|
+|Key creation confirmation screen - the key as JSON file is saved on your computer|
+|![](assets/gc_13.png){height=400px}|
+|Use top bar to search for `App Engine`|
+|![](assets/gc_14.png){height=400px}|
+|Create new application|
+|![](assets/gc_15.png){height=400px}|
+|choose time zone `europe-west6` and connect the editor service account created before|
+|![](assets/gc_16.png){height=400px}|
+|Confirmation screen|
+|![](assets/gc_17.png){height=400px}|
+|Use the top bar to search for `APIs and services`|
+|![](assets/gc_18.png){height=400px}|
+|Click `+ Enable APIs and services`|
+|![](assets/gc_19.png){height=400px}|
+|Search for `Cloud Build API`|
+|![](assets/gc_20.png){height=400px}|
+|Click on `Cloud Build API`|
+|![](assets/gc_21.png){height=400px}|
+|Enable it|
+|![](assets/gc_22.png){height=400px}|
+|Confirmation screen: `Cloud Build API` is active|
+|![](assets/gc_23.png){height=400px}|
+|Back to the API library, search for `App Engine Admin API`|
+|![](assets/gc_24.png){height=400px}|
+|Click on `App Engine Admin API`|
+|![](assets/gc_25.png){height=400px}|
+|Enable it|
+|![](assets/gc_26.png){height=400px}|
+|Confirmation screen: `App Engine Admin API` is active|
+|![](assets/gc_27.png){height=400px}|
+|Go to the server repository on Github & go to the `Settings`|
+|![](assets/gc_28.png){height=400px}|
+|Look for `Secrets and variables` > `Actions`|
+|![](assets/gc_29.png){height=400px}|
+|Ass a `New repository secret`|
+|![](assets/gc_30.png){height=400px}|
+|Name it `GCP_SERVICE_CREDENTIALS` and paste as value the content of the JSON file you download before from Google Cloud console|
+|![](assets/gc_31.png){height=400px}|
+|Back to Google Cloud console - search for `App Engine`|
+|![](assets/gc_32.png){height=400px}|
+|Here you find the link where your backend (server) will be deployed - copy it|
+|![](assets/gc_33.png){height=400px}|
+
+:::
+
+:::{.callout-note appearance=minimal collapse=true title="Push to deploy & verify changes"}
+
+Google Cloud console is now setup and the secrets are loaded in Github: the next time you push to the remote repository, the server application will be automatically deployed (based on the `.gtihub/workflows`).
+
+We can test this out by making some changes locally:
+
+|Local changes: add `GET /users/{id}` endpoint|
+|---|
+|new endpoint in `users.controller` (I have also modified the correpsonding DTO and service files)|
+|![](assets/gc_b_1.png){height=200px}|
+|After creating 3 users, I can see the database locally|
+|![](assets/gc_b_2.png){height=400px}|
+|Test locally my new endpoint|
+|![](assets/gc_b_3.png){height=400px}|
+|Commit and push the changes|
+|![](assets/gc_b_4.png){height=450px}|
+|We are interested in this deploy workflow|
+|![](assets/gc_b_5.png){height=250px}|
+|Confirmation: the `Deploy to App Engine workflow succeded` - for now ignore the other 2|
+|![](assets/gc_b_6.png){height=220px}|
+|Now we can test the new endpoint in production (prod_url is the link we copied before from `App Engine`) <br/> I create 2 users (here you see how to POST a new user)|
+|![](assets/test_prod_1.png){height=400px}|
+|from `prod_url/h2-console`, you can see the tables as you did locally (to access use the same authentication)|
+|![](assets/test_prod_2.png){height=400px}|
+|Test the new endpoint in production|
+|![](assets/test_prod_3.png){height=400px}|
+
+:::
+
+:::{.callout-note appearance=minimal collapse=true title="Update fallback prodUrl in the client repository"}
+
+|Make sure to have the server production URL copied to the clipboard (you find it at Google Cloud console > `App Engine`)|
+|---|
+|Open the client repository in an IDE of your choice|
+|![](assets/gc_34.png){height=400px}|
+|Look for `app/utils/domain.ts` and replace the hardcoded fallback value to the URL you just copied - you completed the TODO commented out there|
+|![](assets/gc_35.png){height=400px}|
+
+Ideally the server URL in production comes from NEXT_PUBLIC_PROD_URL that we are going to set-up later (in the dedicated Vercel part of this tutorial). This only serves as a fallback if, for some reason, the environment variable set in vercel is not retrieved correctly.
+
+:::
+
+:::{.callout-note appearance=minimal collapse=true title="Set-up Sonar cloud and connect it to the sever repository"}
+
+|Go to [https://www.sonarsource.com/](https://www.sonarsource.com/)|
+|---|
+|Register or login (best if with your Github account)|
+|![](assets/s_1.png){height=400px}|
+|Click `Analyze new project`|
+|![](assets/s_2.png){height=400px}|
+|Choose your organization and link the server repository|
+|![](assets/s_3.png){height=400px}|
+|Leave default `Previous version` toggle & click `Create project`|
+|![](assets/s_4.png){height=400px}|
+|Under `Administration` > `Analysis Method` turn off the toggle `Automatic Analysis` (since we are going to push it via CI)|
+|![](assets/s_5.png){height=400px}|
+|Modify your `build.gradle` as in the diff (server repository)|
+|![](assets/s_6.png){height=400px}|
+|Modify your `main.yml` worflow file as in the diff (server repository)|
+|![](assets/s_7.png){height=400px}|
+|We now need to collect the secrets to connect the server repo to sonarcloud. You find the `Project Key` and `Organization Key` under `Information` - copy them|
+|![](assets/s_8.png){height=400px}|
+|Add a new secret to the server repository: `SONAR_PROJECT_KEY` (`Project Key`)|
+|![](assets/s_9.png){height=400px}|
+|Add new secret: `SONAR_ORGANIZAZION` (`Organization Key`)|
+|![](assets/s_10.png){height=400px}|
+|To get the token, click on your profile picture > `My Account` > `Security` - enter a token name (whatever you prefer) > click `Generate Token`|
+|![](assets/s_11.png){height=400px}|
+|Copy the generated token|
+|![](assets/s_12.png){height=400px}|
+|Add new secret: `SONAR_TOKEN`|
+|![](assets/s_13.png){height=400px}|
+|At this point you should have added 3 new secrets to your server repository|
+|![](assets/s_14.png){height=400px}|
+|Commit and push the changes to your server repository. Now both the Google cloud deploy and the `Test and Sonarqube` should be successfull|
+|![](assets/s_15.png){height=400px}|
+|In SonarQube, under your project, you can see the results|
+|![](assets/s_16.png){height=400px}|
+|and navigate between them|
+|![](assets/s_17.png){height=400px}|
+
+:::
+
+
+### Set-up Vercel and link it to the client repository
+
+:::{.callout-note appearance=minimal collapse=true title="Set-up Vercel project and connect the client repository"}
+
+|Navigate to [vercel.com](vercel.com)|
+|---|
+|Create an account or login (best if with your Github account)|
+|![](assets/v_1.png){height=400px}|
+|Create a new project|
+|![](assets/v_2.png){height=400px}|
+|Connect the client repository (either you already connected your Github profile or you should do it now)|
+|![](assets/v_3.png){height=400px}|
+|Name the project & click `Deploy`|
+|![](assets/v_4.png){height=400px}|
+|The deployment will start|
+|![](assets/v_5.png){height=400px}|
+|Confirmation: deployment was succesfull|
+|![](assets/v_6.png){height=400px}|
+|This is the overview page of your Vercel project|
+|![](assets/v_7.png){height=400px}|
+|In the `.github/workflows/verceldeployment.yml` you can see that 3 secrets are needed: this should be added to the github client repository|
+|![](assets/v_8.png){height=400px}|
+|In Vercel under `Settings` > `General`, you will find your `Project ID` - copy it|
+|![](assets/v_9.png){height=400px}|
+|In your client repository, create an new repository secret matching precisely the name from your workflow file: `VERCEL_PROJECT_ID`|
+|![](assets/v_10.png){height=400px}|
+|To find your `User ID` (= `Organization ID`), navigate to the `Account Settings`|
+|![](assets/v_11.png){height=400px}|
+|Under `General`, you find the `User ID` - copy it|
+|![](assets/v_12.png){height=400px}|
+|New repository secret `VERCEL_ORG_ID` - paste the copied `User ID` (= `Organization ID`)|
+|![](assets/v_13.png){height=400px}|
+|To generate a new `Token`, from the `Account Settings` > `Tokens` - give it a name (whatever you want), a scope (your organization) and an expiration date - click create|
+|![](assets/v_14.png){height=400px}|
+|Confirmation: token is created - copy it|
+|![](assets/v_15.png){height=400px}|
+|New repository secret: `VERCEL_TOKEN` - paste the copied token|
+|![](assets/v_16.png){height=400px}|
+|The 3 secrets should be visible under `Settings` > `Secrets and variables` in your **client repository**|
+|![](assets/v_17.png){height=400px}|
+|We need to add a last `Environment Variables` in Vercel > your client project > `Settings` > `Environment Variables` > `Add Environment Variable`|
+|![](assets/v_18.png){height=400px}|
+|Name `NEXT_PUBLIC_PROD_URL` and paste the server production URL from Google Cloud console > `App Engine` (the same we pasted into the client repository in `domain.ts`)|
+|![](assets/v_19.png){height=400px}|
+|Now you can commit and push your changes from the client repository|
+|![](assets/v_20.png){height=400px}|
+|The Vercel deployment workflow will start|
+|![](assets/v_21.png){height=200px}|
+|From the overview page of your project, you can `Visit` the deployed client side application|
+|![](assets/v_22.png){height=400px}|
+|Verify it's connected with the backend (server repository deployed on Google Cloud) by navigating to `/users` - here we see the users we created before|
+|![](assets/v_23.png){height=400px}|
+|under `/login` you can create a new user|
+|![](assets/v_24.png){height=400px}|
+|and verify it has been created|
+|![](assets/v_25.png){height=400px}|
+
+:::
