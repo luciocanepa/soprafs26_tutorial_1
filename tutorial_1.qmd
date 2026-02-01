@@ -10,6 +10,7 @@ language:
 format:
   html:
     theme: cosmo
+    embed-resources: true
     code-copy: true
     smooth-scroll: true
     html-math-method: katex
@@ -34,6 +35,91 @@ format:
         \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines=true,breakanywhere=true,commandchars=\\\{\}}
         \RecustomVerbatimEnvironment{verbatim}{Verbatim}{breaklines=true,breakanywhere=true}
 ---
+
+## Introduction
+
+The goal of SOPRA and particurlaly Milestone 1 is to get familiar with the basics of Full-Stack web development with the chosen frameworks.
+
+This guide offers step-by-step tutorials to set-up your local machine for development and deploy it. Conceptual explanations and recommandations are also included.
+
+:::{.callout-note appearance=minimal collapse=true title="What's a Web Application? - Main concepts"}
+
+**Web Application components**
+
+Web applications are usually built with 3 fundamentals components:
+
+- **Client:** This is what the users see when visiting a web application. It's responsible to fetch the data and display it to the user in an interactive way. The client can interact with the data trough the **backend** and a defined API between them (in our and most cases **REST**)
+- **Backend (Server):** The backend has direct access to the database (can read and write) and offers specific access points (**endpoints**) to clients. It's responsible to manage the complexity of retrieving the needed data that clients request and check access permission.
+- **Database:** The database store the actual data. There can be many types of databases and languages to interact with it. In this course, a semi-persistent database (only lives in memory, RAM) based on Postgress and accessible trough SQL is set-up.
+
+:::{.callout-important title="TODO"}
+**Include diagram**
+:::
+
+**REST**
+
+REST stands for REpresentational State Transfer and offers **CRUD** (**C**reate, **R**ead, **U**pdate, **D**elete) operations hitting a specific endpoint.
+
+**Endpoints**
+
+Endpoints are specific URI to describe a specifc resource to retrive: `/users/{id}`.
+
+Used in combination with REST:
+
+`GET /users/{id}`
+
+`header: Authorization token (a key used by the backend to grant acces to the resource)`
+
+:::{.callout-note title="Database"}
+The setup of the server repository in SOPRA already contains and spins up the in-memory database. This means that there is no external database to handle.
+:::
+
+---
+
+**Deployment**
+
+The 2 repositories templates available for sopra are:
+
+- sopra-fs26-template-client
+- sopra-fs26-template-server
+
+responsible for the client and server.
+
+These repositories are hosted on Github. As a convention, the `main` branch represents the latest working instance (what should be deployed and accessible by the users). The 2 repositories are respectively deployed on:
+
+- client on Vercel
+- server (together with the in-memory database) on Google Cloud
+
+This happens automatically when someone pushes code changes on the `main` branch: this is managed with Github Workflow to support continuous development (there is no need to manually deploy applications).
+
+---
+
+**Development**
+
+We usually refer to 2 main environments:
+
+- production: the one we just discussed and acutally run the application accessible to the users
+- development: where developers work on their local machine, change and share code while implementing new features and fixing bugs.
+
+Developers clone the repositories hosted on Github on their local machine, work on the code and push the code (they share the changes to Github – with the other team members). If it's the case, the automatic CI/CD pipeline defined by Github workflows take care of it and redeploys the application.
+
+To run and test the application locally, you need:
+
+- local application running with the client
+- local application running wiht the backend (server)
+
+---
+
+**Development flow**
+
+- clone application locally
+- install needed dependencies to run it locally
+- implement a new feature / fix a bug
+- test locally that everything works correctly
+- push the new code the remote (Github) usually on a feature branch
+- once the code is tested and ready to be integrated into production, the feature branch gets merged into the `main` branch, triggering the deployment
+
+:::
 
 ## What do you need before starting
 
@@ -136,29 +222,34 @@ at the end of the file, save and close it.
 
 Run `source ~/.zshrc` to reload the configuration file.
 
+:::
+
+:::{.callout-note icon=false collapse="true" title="Linux / WSL"}
+
+After making sure you have `git` and `curl` installed on your system:
+
+```bash
+sudo apt update
+sudo apt install git curl
+```
+
+you can install Java 17 with:
+
+```bash
+sudo apt install openjdk-17-jdk
+```
+
+Depending on your package manager of choice.
+
+:::
+
 Ensure you have Java 17 installed and configured correctly by running:
 ```txt
 macvm@Macs-Virtual-Machine sopra_server_tutorial % java -version
 openjdk version "17.0.17" 2025-10-21
 OpenJDK Runtime Environment Temurin-17.0.17+10 (build 17.0.17+10)
 OpenJDK 64-Bit Server VM Temurin-17.0.17+10 (build 17.0.17+10, mixed mode, sharing)
-macvm@Macs-Virtual-Machine sopra_server_tutorial % echo $JAVA_HOME
-/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home
-macvm@Macs-Virtual-Machine sopra_server_tutorial % which java
-/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home/bin/java
 ```
-
-:::{.callout-note}
-Checking `java -version` is usually enough to verify the installation.
-:::
-
-:::
-
-:::{.callout-important title="TODO"}
-
-**Linux / Windows**
-
-:::
 
 :::
 
@@ -231,7 +322,7 @@ Or `code .` to open the current folder.
 
 Run `source setup.sh` as described in the `README.md` to install needed packages / dependencies.
 
-Deno and npm (2 TS to JS runtimes) are available in the repository: use `deno task dev` to run the development server locally (at default port `localhost:3000`).
+Deno and npm (2 TS to JS runtimes) are available in the repository: use `npm run dev` to run the development server locally (at default port `localhost:3000`).
 
 At `package.json` you can find available scripts:
 
@@ -301,7 +392,7 @@ At `localhost:8080/h2-console` you can access the H2 database console: Informati
 
 ### Git short guide
 
-To get started working with local / remote repositories and collaborate with your team members, it's important to get to know the most used git commands. [Videos](https://youtu.be/Ala6PHlYjmw?si=Tkj5vX3EtMhbngEg), the [official documentation](https://git-scm.com/docs/git) and LLMs (with caution) are good starting point.
+To get started working with local / remote repositories and collaborate with your team members, it's important to get to know the most used git commands. [Videos](https://youtu.be/Ala6PHlYjmw?si=Tkj5vX3EtMhbngEg), the [official documentation](https://git-scm.com/docs/git) and LLMs (with caution) are a good starting point.
 
 Here we selected a subset of commands we consider relevant for this course.
 
@@ -451,7 +542,7 @@ You should decide as a team what you want to prioritise and what approach / rule
 :::
 
 
-:::{.callout-tip appearance=minimal collapse=false title="Best practices"}
+:::{.callout-tip appearance=minimal collapse=true title="Best practices"}
 
 **Commits**
 
@@ -474,16 +565,83 @@ You should decide as a team what you want to prioritise and what approach / rule
 
 ### Github workflows
 
-:::{.callout-important title="TODO"}
+The SOPRA project relies on **CI/CD** (Continuous Integration / Continuous Deployment) to deploy (publish) the changes from the repositories hosted on Github to:
 
-**Briefly explain what Github workflows are / where they live in the repo / their structure**
+- Vercel for the client
+- Google Cloud for the server
+
+Instead of manually testing and deploying your code, **Workflows** are defined using GitHub Actions. These workflows are defined in YAML files located in `.github/workflows/` inside your repository.
+They define when they should run and allow granular and automated control on the deployment.
+
+:::{.callout-note appearance=minimal collapse=true title="Environment Variables & Secrets"}
+
+Applications require configuration that changes depending on where the code is running (e.g., a database URL that is `localhost` on your laptop but a Google Cloud URL in production) or sensitive data (passwords, API keys).
+
+**Locally (`.env`):**
+On your machine, you store these in a `.env` file. The repository already includes a `.gitignore` that prevents this file from being uploaded to GitHub.
+
+:::{.callout-warning title="Security Risk"}
+Never commit your `.env` file or hardcode API keys/passwords in your source code. If you push a key to a public repository, it is compromised immediately.
+:::
+
+**Remotely (GitHub Secrets):**
+To let GitHub Actions access these values (to login to Google Cloud or Vercel), you must store them in the repository settings under `Settings > Secrets and variables > Actions`.
 
 :::
 
+:::{.callout-note appearance=minimal collapse=true title="Workflow example (client)"}
+
+Workflow files are usually intuitive enough to read and unsderstand. If we take the client deployment to Vercel as an example (`.github/workflows/verceldeployment.yml`):
+
+```yaml
+name: Deploy to Vercel
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Deploy to Vercel
+        run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }} --confirm
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+```
+
+When new code is pushed to the `main` branch, 1 jobs is runned:
+
+- defines the type of job (deploy) and the environment (latest Ubuntu)
+- defined the steps: first it install needed resources
+- then – in this case – reaches out to Vercel to deploy the frontend application
+- to do so it needs environmnet variables (secrets) to connect and authenticate to Vercel. This secrets are defined in the repository settings.
+:::
+
+When deploying you need to make sure that the Environment variables are set correctly in the repository settings in Github. You can add / modify the content of these files to control their behavior.
+_eg._ you might want to deploy a staging environment (`develop` branch) and test your changes in a production-like environment without making them accessible in production (`main`).
 
 ## Set-up Google Cloud and Vercel & deploy your project
 
 ### Set-up Google Cloud and link it to the server repository
+
+:::{.callout-important title="TODO"}
+Include overview / brief explanation of what should be set-up in the end
+:::
 
 :::{.callout-note appearance=minimal collapse=true title="Set-up Google Cloud"}
 
@@ -699,4 +857,8 @@ Ideally the server URL in production comes from NEXT_PUBLIC_PROD_URL that we are
 |and verify it has been created|
 |![](assets/v_25.png){height=400px}|
 
+:::
+
+:::{.callout-important title="TODO"}
+Docker
 :::
