@@ -871,6 +871,49 @@ Ideally the server URL in production comes from NEXT_PUBLIC_PROD_URL that we are
 
 :::
 
-:::{.callout-important title="TODO"}
-Docker
+### Set-up Docker Hub and containerize your server application
+
+Docker allows you to package your application into a *container* – a standardized unit that includes everything needed to run the software (code, runtime, libraries, dependencies). This makes it easy to run your application consistently on any machine.
+
+:::{.callout-note appearance=minimal collapse=true title="Create Docker Account"}
+
+1. Navigate to [hub.docker.com](https://hub.docker.com) and create an account
+2. Incorporate your group number into the account name, for example sopra_group_12
+3. After logging in, click Create repository
+4. Name the repository *exactly the same* as your GitHub server repository name (e.g., sopra-fs26-template-server) – set visibility to Public & click Create
+
+:::
+
+:::{.callout-note appearance=minimal collapse=true title="Adding Secrets"}
+
+1. From Docker Hub, click on your profile picture > Account settings > Personal access tokens
+2. Click Generate new token – give it a description (e.g., github-actions), select *Read & Write* access & click Generate
+3. Copy the generated token immediately – you won't be able to see it again
+4. Go to your *server repository* on GitHub > Settings > Secrets and variables > Actions
+5. Click New repository secret and add the following 3 secrets:
+
+| Name | Value |
+|------|-------|
+| dockerhub_username | Your Docker Hub username (e.g., sopra_group_12) |
+| dockerhub_password | The PAT you generated (not your login password!) |
+| dockerhub_repo_name | Your Docker Hub repository name |
+
+:::{.callout-caution}
+The secret names must match *exactly* what's in your workflow file, including lowercase letters and underscores.
+:::
+
+:::
+
+:::{.callout-note appearance=minimal collapse=true title="Running Workflow"}
+
+Push any change to your main branch to trigger the workflow:
+
+bash
+git add .
+git commit -m "trigger docker build"
+git push origin main
+
+
+Go to your GitHub repository > Actions tab – you should see the Dockerize workflow running. Once successful (green checkmark), go to your Docker Hub repository – you should see your image with the latest tag.
+
 :::
