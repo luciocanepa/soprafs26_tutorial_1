@@ -253,10 +253,22 @@ OpenJDK 64-Bit Server VM Temurin-17.0.17+10 (build 17.0.17+10, mixed mode, shari
 
 :::
 
-:::{.callout-important title="TODO"}
+:::{.callout-note appearance=minimal title="Install WSL on Windows" collapse="true"}
 
-**Install WSL on Windows**
+If you are using **Windows**, you need to install **WSL (Windows Subsystem for Linux)** before continuing with the Linux/WSL installation steps (Git, Curl, Java, ...).
 
+:::{.callout-tip}
+**Save your work first:** the installation may require a reboot.
+:::
+
+1. Open **PowerShell as Administrator**  
+   Start Menu → search **PowerShell** → right-click → **Run as administrator**
+
+2. Run:
+
+```powershell
+wsl --install
+```
 :::
 
 :::{.callout-tip}
