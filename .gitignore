@@ -1,7 +1,9 @@
-# quarto generated files
-tutorial_1_files/*
+# Quarto generated files
+/.quarto/
+/_site/
+/index_files/
 
-# renderings
+# Local renderings
 *.pdf
 *.html
 

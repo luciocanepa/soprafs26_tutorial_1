@@ -1,0 +1,18 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "SOPRA Tutorial 1"
+  sidebar:
+    style: "floating"
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    toc-depth: 2
+    toc-expand: true
+    other-links:
+      - text: Download PDF Version
+        href: index.pdf
