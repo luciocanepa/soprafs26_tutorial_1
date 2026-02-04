@@ -1,12 +1,16 @@
 ---
 title: "Tutorial 1 - SOPRA"
-author: "Lucio Canepa"
+author:
+  - "Lucio Canepa"
+  - "Joel Cedric Schmidt"
+  - "Luke Benjamin Fohringer"
 date: last-modified
 toc: true
+toc-expand: true
 number-sections: true
 language:
   en:
-    published: "Last update"
+    title-block-published: "last updated"
 format:
   html:
     theme: cosmo
@@ -16,10 +20,10 @@ format:
     html-math-method: katex
   pdf:
     pdf-engine: xelatex
-    documentclass: scrartcl     # KOMA-Script article (European standard)
-    mainfont: "TeX Gyre Heros"  # A clean Sans-Serif font (Helvetica clone, standard in TeX)
+    documentclass: scrartcl
+    mainfont: "TeX Gyre Heros"
     sansfont: "TeX Gyre Heros"
-    monofont: "TeX Gyre Cursor" # A clean Monospace font (Courier clone)
+    monofont: "TeX Gyre Cursor"
     geometry:
       - top=25mm
       - bottom=25mm
@@ -27,8 +31,6 @@ format:
       - right=25mm
     colorlinks: true
     code-block-bg: true
-
-    # CRITICAL FIXES FOR PDF:
     include-in-header:
       text: |
         \usepackage{fvextra}
@@ -52,8 +54,10 @@ Web applications are usually built with 3 fundamentals components:
 - **Backend (Server):** The backend has direct access to the database (can read and write) and offers specific access points (**endpoints**) to clients. It's responsible to manage the complexity of retrieving the needed data that clients request and check access permission.
 - **Database:** The database store the actual data. There can be many types of databases and languages to interact with it. In this course, a semi-persistent database (only lives in memory, RAM) based on Postgress and accessible trough SQL is set-up.
 
-:::{.callout-important title="TODO"}
-**Include diagram**
+:::{.callout-note appearance=simple collapse=true title="Diagram"}
+
+![](assets/sopra_architecture.svg){height=1000px}
+
 :::
 
 **REST**
@@ -123,12 +127,29 @@ To run and test the application locally, you need:
 
 ## What do you need before starting
 
+To clone the code on your machine and run it locally, you need to set-up / have installed:
+
 - [git](https://git-scm.com/install/mac): version control system
 - java 17+ (JDK) installed and `JAVA_HOME` environment variable set
 
 
 - [Github account](https://github.com/)
 - ssh key to authenticate with Github easily
+
+You will install other needed packages from set-up files provided by the repositories.
+
+:::{.callout-warning}
+
+If you are on Windows, make sure to install WSL (Windows Subsystem for Linux) first.
+
+:::
+
+:::{.callout-tip}
+If your are on a Mac, I highly recommend installing [Homebrew](https://brew.sh/) as package manager:
+
+- You can install packages with: `brew install <package_name>`
+- You can install applications with: `brew install --cask <application_name>`
+:::
 
 :::{.callout-note icon=false appearance=minimal collapse="true" title="Setup ssh key"}
 
@@ -261,7 +282,7 @@ If you are using **Windows**, you need to install **WSL (Windows Subsystem for L
 **Save your work first:** the installation may require a reboot.
 :::
 
-1. Open **PowerShell as Administrator**  
+1. Open **PowerShell as Administrator**
    Start Menu → search **PowerShell** → right-click → **Run as administrator**
 
 2. Run:
@@ -269,13 +290,6 @@ If you are using **Windows**, you need to install **WSL (Windows Subsystem for L
 ```powershell
 wsl --install
 ```
-:::
-
-:::{.callout-tip}
-If your are on a Mac, I highly recommend installing [Homebrew](https://brew.sh/) as package manager:
-
-- You can install packages with: `brew install <package_name>`
-- You can install applications with: `brew install --cask <application_name>`
 :::
 
 ## Clone repositories & run code locally
@@ -332,6 +346,17 @@ Or `code .` to open the current folder.
 
 ### Client repository
 
+:::{.callout-tip}
+If while `cd`-ing into a repo folder this message shows up:
+
+```bash
+macvm@Macs-Virtual-Machine sopra % cd sopra_server_tutorial
+direnv: error /Users/macvm/sopra/sopra_server_tutorial/.envrc is blocked. Run `direnv allow` to approve its content
+```
+
+run `direnv allow` to enable the automatic environment variable loading. If direnv is not installed, install it with your package manager of choice (or curl it).
+:::
+
 Run `source setup.sh` as described in the `README.md` to install needed packages / dependencies.
 
 Deno and npm (2 TS to JS runtimes) are available in the repository: use `npm run dev` to run the development server locally (at default port `localhost:3000`).
@@ -351,17 +376,6 @@ At `package.json` you can find available scripts:
 The code for your app lives under `app/` folder: there you can find the entry point to the application at `app/page.tsx`. Try to change something to see it automatically update in the browser on save.
 
 ### Server repository
-
-:::{.callout-tip}
-If while `cd`-ing into a repo folder this message shows up:
-
-```bash
-macvm@Macs-Virtual-Machine sopra % cd sopra_server_tutorial
-direnv: error /Users/macvm/sopra/sopra_server_tutorial/.envrc is blocked. Run `direnv allow` to approve its content
-```
-
-run `direnv allow` to enable the automatic environment variable loading.
-:::
 
 To build the application, use the provided Gradle wrapper. You first need to grant permission to the executable:
 
@@ -547,9 +561,56 @@ You should decide as a team what you want to prioritise and what approach / rule
 
 :::
 
-:::{.callout-important title="TODO"}
+:::{.callout-warning appearance=minimal collapse=true title="Resolve conflicts"}
 
-**Resolve conflicts**
+When collaborating on a git repository, more developers may modify the same file / functionality. This divergence creates conflict:
+
+> git asks itself: what should I keep between the 2 options I see?
+
+In most cases, git solves this conflicts automatically:
+
+- _eg._ when pulling, if you set `git config pull.rebase true`, git tries automatically to move your changes on top of the pulled commits).
+- when changes are on same file / functionality but not conflicting: can keep both of them
+
+git will prompt you to resolve conflicts only when it wasn't able on its own to decide what to keep and what to ignore. This often happens when you merge a `feature` branch into your `main` branch. Most code editors (VS code _eg._) have built-in conflicts resolution tools we suggest to use.
+
+:::{.callout-note appearance=minimal collapse=true title="Demonstration"}
+
+|Merge without conflicts|
+|---|
+|We want to modify how users/[id] looks|
+|![](assets/git_conflicts_1.png){height=400px}|
+|For this let's create a branch to work on: `#101_restyle_user`|
+|![](assets/git_conflicts_2.png){height=200px}|
+|There we modify the code and get:|
+|![](assets/git_conflicts_3.png){height=450px}|
+|2 new files and 1 modified - we can commit and push (on `#101_restyle_user`)|
+|![](assets/git_conflicts_4.png){height=450px}|
+|when we checkout to `main` and merge everything works: git was able to resolve conflicts on its own|
+|![](assets/git_conflicts_5.png){height=400px}|
+|The new commit is added to the history of `main`|
+|![](assets/git_conflicts_6.png){height=300px}|
+
+|Merge with conflicts|
+|---|
+|Let's modify the `userHeader()` function on `#101_restyle_user`|
+|![](assets/git_conflicts_7.png){height=250px}|
+|Commit and push (on `#101_restyle_user`)|
+|![](assets/git_conflicts_8.png){height=400px}|
+|Let's modify the same function `userHeader()` on `main` in a different way - commit|
+|![](assets/git_conflicts_9.png){height=200px}|
+|Try to merge `#101_restyle_user` on `main` &rarr; conflict|
+|![](assets/git_conflicts_10.png){height=100px}|
+|In VS code (under the git tab) you can see merge conflicts - click on `Resolve in Merge Editor`|
+|![](assets/git_conflicts_11.png){height=400px}|
+|Here you can choose what to keep and what to discard (or manually update the file to a new resolution) - click `Complete Merge` when you are done (0 conflicts)|
+|![](assets/git_conflicts_12.png){height=400px}|
+|You can click `continue` to proceed with the `merge` with conflicts resolved|
+|![](assets/git_conflicts_13.png){height=400px}|
+|You can see the updated graph after merging and resolving conflicts|
+|![](assets/git_conflicts_14.png){height=100px}|
+
+:::
 
 :::
 
@@ -649,11 +710,48 @@ _eg._ you might want to deploy a staging environment (`develop` branch) and test
 
 ## Set-up Google Cloud and Vercel & deploy your project
 
+To make the application available, you need to deploy your changes:
+
+**Server repository**
+
+`main.yml` file runs 2 jobs when pushed on `main`:
+
+- test (optional for now): runs the Jtest on the packaged version and make the results available at SonarQube
+- deploy: deploys the application to the Google Cloud instance set-up as described below.
+
+`dockerize.yml` creates a docker container and register it. This is optional for now, but will be needed later: a dedicated section explains what docker is and how to set it up.
+
+**Client repository**
+
+`verceldeployment.yml` file deploys the frontend code to vercel when pushed on `main`
+
+`dockerize.yml` does exactly the same, but for the client (optional for now).
+
+`sonarcloud.yml` runs an analysis (scan) of the code and publish the resulsts to SonarQube (optional for now)
+
 ### Set-up Google Cloud and link it to the server repository
 
-:::{.callout-important title="TODO"}
-Include overview / brief explanation of what should be set-up in the end
-:::
+To set up the backend infrastructure on Google Cloud, the following services and entities must be successfully configured and enabled (as illustrated in the step-by-step tutorials):
+
+**Core Infrastructure**
+
+- GCP Project: A dedicated project container named sopra-fs26-[lastname]-[firstname]-server.
+- App Engine Application: The specific environment where the Java/Spring Boot server resides, localized in the europe-west6 region.
+
+**Identity & Access Management (IAM)**
+
+- Service Account: A virtual identity used by GitHub Actions to interact with your Google Cloud resources.
+- Editor Role: The specific permission level granted to the Service Account to allow resource modification.
+- Service Account Key: A generated JSON key that serves as the "password" for GitHub to log into your Google Cloud project.
+
+**Cloud APIs (Must be "Enabled")**
+
+- Cloud Build API: Handles the building of your application code into a deployable format.
+- App Engine Admin API: Allows external tools (like GitHub Actions) to manage and deploy versions of your App Engine service.
+
+**Secrets Management**
+
+- `GCP_SERVICE_CREDENTIALS`: The GitHub Actions secret containing the JSON key, which bridges the link between your code repository and the Google Cloud entities listed above.
 
 :::{.callout-note appearance=minimal collapse=true title="Set-up Google Cloud"}
 
@@ -770,7 +868,7 @@ Ideally the server URL in production comes from NEXT_PUBLIC_PROD_URL that we are
 
 :::
 
-:::{.callout-note appearance=minimal collapse=true title="Set-up Sonar cloud and connect it to the sever repository"}
+:::{.callout-note appearance=minimal collapse=true title="Set-up Sonar cloud and connect it to the sever repository (optional)"}
 
 |Go to [https://www.sonarsource.com/](https://www.sonarsource.com/)|
 |---|
@@ -813,6 +911,23 @@ Ideally the server URL in production comes from NEXT_PUBLIC_PROD_URL that we are
 
 
 ### Set-up Vercel and link it to the client repository
+
+To set up the frontend on Vercel, the following components must be configured (as in the step-by-step tutorial):
+
+**Platform & Project**
+
+- Vercel Project: Linked directly to your GitHub client repository.
+- Deployment URL: The live production link for the web application.
+
+**GitHub Secrets (for CI/CD)**
+
+- `VERCEL_TOKEN`: Authorized access token for deployment.
+- `VERCEL_ORG_ID`: Your Vercel account/organization identifier.
+- `VERCEL_PROJECT_ID`: The specific ID for the client project.
+
+**Environment Variables**
+
+- `NEXT_PUBLIC_PROD_URL`: The backend's Google Cloud URL, stored in Vercel settings to enable frontend-backend communication.
 
 :::{.callout-note appearance=minimal collapse=true title="Set-up Vercel project and connect the client repository"}
 
