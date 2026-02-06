@@ -3,16 +3,16 @@ project:
   output-dir: _site
 
 website:
-  title: "SOPRA Tutorial 1"
-  sidebar:
-    style: "floating"
+  sidebar: false
+  navbar: false
 
 format:
   html:
     theme: cosmo
+    page-layout: full
     toc: true
     toc-depth: 2
-    toc-expand: true
-    other-links:
-      - text: Download PDF Version
-        href: index.pdf
+    toc-location: right
+    number-sections: true
+  pdf:
+    pdf-engine: xelatex
